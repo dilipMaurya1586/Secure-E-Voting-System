@@ -1,15 +1,29 @@
 const express = require('express');
-const path = require('path'); // ✅ Ye add kiya
+const path = require('path');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
 
 dotenv.config();
-connectDB();
 
+// ✅ IMPORTANT: Vercel serverless ke liye
 const app = express();
-app.use(cors());
+
+// CORS setup
+app.use(cors({
+    origin: ['https://blockchain-based-secure-e-voting-sy.vercel.app', 'http://localhost:3000'],
+    credentials: true
+}));
+
 app.use(express.json());
+
+// Connect to MongoDB (with serverless-optimized connection)
+let isConnected = false;
+const connectToDatabase = async () => {
+    if (isConnected) return;
+    await connectDB();
+    isConnected = true;
+};
 
 // API Routes
 app.use('/api/auth', require('./routes/authRoutes'));
@@ -17,40 +31,26 @@ app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/voter', require('./routes/voterRoutes'));
 app.use('/api/results', require('./routes/resultRoutes'));
 
-// ✅ Serve static assets in production
+// Serve static files in production
 if (process.env.NODE_ENV === 'production') {
-    // Client build folder serve karo
-    app.use(express.static(path.join(__dirname, '../client/build')));
+    const buildPath = path.join(__dirname, '../client/dist');
+    app.use(express.static(buildPath));
 
-    // Any route jo API na ho, frontend bhejo
     app.get('*', (req, res) => {
-        res.sendFile(path.resolve(__dirname, '../client', 'build', 'index.html'));
+        if (!req.path.startsWith('/api')) {
+            res.sendFile(path.join(buildPath, 'index.html'));
+        }
     });
-} else {
-    // Development mode mein API running message
-    app.get('/', (req, res) => res.send('API Running'));
 }
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
-// const express = require('express');
-// const dotenv = require('dotenv');
-// const cors = require('cors');
-// const connectDB = require('./config/db');
+// ✅ Vercel serverless export
+module.exports = app;
 
-// dotenv.config();
-// connectDB();
-
-// const app = express();
-// app.use(cors());
-// app.use(express.json());
-
-// app.use('/api/auth', require('./routes/authRoutes'));
-// app.use('/api/admin', require('./routes/adminRoutes'));
-// app.use('/api/voter', require('./routes/voterRoutes'));
-// app.use('/api/results', require('./routes/resultRoutes'));
-
-// app.get('/', (req, res) => res.send('API Running'));
-
-// const PORT = process.env.PORT || 5000;
-// app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+// Local development ke liye
+if (require.main === module) {
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+        console.log(`Server started on port ${PORT}`);
+        connectToDatabase();
+    });
+}
