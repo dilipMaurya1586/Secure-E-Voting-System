@@ -10,25 +10,5 @@
                 }
             ]
         }
-    ],
-    "builds": [
-        {
-            "src": "server/server.js",
-            "use": "@vercel/node"
-        },
-        {
-            "src": "client/**",
-            "use": "@vercel/static"
-        }
-    ],
-    "routes": [
-        {
-            "src": "/api/(.*)",
-            "dest": "server/server.js"
-        },
-        {
-            "src": "/(.*)",
-            "dest": "client/dist/$1"
-        }
     ]
 }
