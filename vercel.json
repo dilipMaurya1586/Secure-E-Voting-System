@@ -1,12 +1,32 @@
 {
     "version": 2,
+    "builds": [
+        {
+            "src": "server/server.js",
+            "use": "@vercel/node"
+        },
+        {
+            "src": "client/**",
+            "use": "@vercel/static"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/api/(.*)",
+            "dest": "server/server.js"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "client/dist/$1"
+        }
+    ],
     "headers": [
         {
             "source": "/(.*)",
             "headers": [
                 {
                     "key": "Content-Security-Policy",
-                    "value": "default-src 'self' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: https://vercel.live; style-src 'self' 'unsafe-inline' https:; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https: wss:; frame-src 'self' https: https://vercel.live;"
+                    "value": "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; font-src * data:; img-src * data:; connect-src *; frame-src *;"
                 }
             ]
         }
