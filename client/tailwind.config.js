@@ -1,14 +1,4 @@
 /** @type {import('tailwindcss').Config} */
-// export default {
-//   content: [
-//      "./index.html",
-//     "./src/**/*.{js,ts,jsx,tsx}",
-//   ],
-//   theme: {
-//     extend: {},
-//   },
-//   plugins: [],
-// }
 module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
@@ -28,6 +18,9 @@ module.exports = {
           800: '#1e40af',
           900: '#1e3a8a',
         }
+      },
+      fontFamily: {
+        'poppins': ['Poppins', 'sans-serif'], // ✅ YEH LINE ADD KI
       },
       animation: {
         'bounce-slow': 'bounce 2s infinite',
