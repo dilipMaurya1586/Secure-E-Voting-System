@@ -6,10 +6,6 @@ const connectDB = require('./config/db');
 
 dotenv.config();
 
-// ✅ TEMPORARY - Environment variables hardcode (sirf test ke liye)
-process.env.MONGO_URI = 'mongodb+srv://blockchain_based_secure_e-voting_system:dilipmaurya1586@cluster0.exivrob.mongodb.net/evoting';
-process.env.JWT_SECRET = 'supersecretkey';
-process.env.NODE_ENV = 'production';
 
 // ✅ IMPORTANT: Vercel serverless ke liye
 const app = express();
