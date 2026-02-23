@@ -13,11 +13,12 @@
     "routes": [
         {
             "src": "/api/(.*)",
-            "dest": "/server/server.js"
+            "dest": "server/server.js"
         },
         {
             "src": "/(.*)",
-            "dest": "/client/dist/index.html"
+            "dest": "client/dist/index.html"
         }
-    ]
+    ],
+    "cleanUrls": true
 }
