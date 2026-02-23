@@ -1,5 +1,8 @@
 import axios from 'axios';
+import { login as apiLogin } from '../services/api';  // ✅ API service import
 
+// In handleSubmit:
+const response = await apiLogin({ email, password });
 console.log("API file loaded");
 console.log("VITE_API_URL:", import.meta.env.VITE_API_URL); // Debug
 
@@ -22,6 +25,7 @@ API.interceptors.request.use((req) => {
 
   return req;
 });
+
 
 // Auth APIs
 export const register = (userData) => API.post('/auth/register', userData);
