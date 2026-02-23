@@ -5,8 +5,16 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 
 dotenv.config();
+
+// ✅ TEMPORARY - Environment variables hardcode (sirf test ke liye)
+process.env.MONGO_URI = 'mongodb+srv://blockchain_based_secure_e-voting_system:dilipmaurya1586@cluster0.exivrob.mongodb.net/evoting';
+process.env.JWT_SECRET = 'supersecretkey';
+process.env.NODE_ENV = 'production';
+
+// ✅ IMPORTANT: Vercel serverless ke liye
 const app = express();
 
+// CORS setup
 app.use(cors({
     origin: ['https://blockchain-based-secure-e-voting-sy.vercel.app', 'http://localhost:3000'],
     credentials: true
@@ -14,11 +22,17 @@ app.use(cors({
 
 app.use(express.json());
 
+// Connect to MongoDB (with serverless-optimized connection)
 let isConnected = false;
 const connectToDatabase = async () => {
     if (isConnected) return;
-    await connectDB();
-    isConnected = true;
+    try {
+        await connectDB();
+        isConnected = true;
+        console.log('MongoDB Connected Successfully');
+    } catch (error) {
+        console.error('MongoDB Connection Error:', error);
+    }
 };
 
 // API Routes
@@ -27,7 +41,22 @@ app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/voter', require('./routes/voterRoutes'));
 app.use('/api/results', require('./routes/resultRoutes'));
 
-// Local development
+// Simple route for root
+app.get('/', (req, res) => {
+    res.send('🚀 Server is running! API is live at /api');
+});
+
+// ✅ Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Server Error:', err);
+    res.status(500).json({ 
+        msg: 'Internal Server Error',
+        error: err.message,
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+});
+
+// Local development ke liye
 if (require.main === module) {
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
@@ -36,5 +65,63 @@ if (require.main === module) {
     });
 }
 
-// ✅ Vercel export - SAHI JAGAH
+// ✅ Vercel serverless export
 module.exports = app;
+
+
+
+
+
+
+// const express = require('express');
+// const path = require('path');
+// const dotenv = require('dotenv');
+// const cors = require('cors');
+// const connectDB = require('./config/db');
+
+// dotenv.config();
+// const app = express();
+
+// app.use(cors({
+//     origin: ['https://blockchain-based-secure-e-voting-sy.vercel.app', 'http://localhost:3000'],
+//     credentials: true
+// }));
+
+// app.use(express.json());
+
+// let isConnected = false;
+// const connectToDatabase = async () => {
+//     if (isConnected) return;
+//     await connectDB();
+//     isConnected = true;
+// };
+
+// // API Routes
+// app.use('/api/auth', require('./routes/authRoutes'));
+// app.use('/api/admin', require('./routes/adminRoutes'));
+// app.use('/api/voter', require('./routes/voterRoutes'));
+// app.use('/api/results', require('./routes/resultRoutes'));
+
+
+// // API Routes ke baad yeh add karo (line 35 ke around)
+// app.use((err, req, res, next) => {
+//     console.error('Server Error:', err);
+//     res.status(500).json({ 
+//         msg: 'Internal Server Error',
+//         error: err.message,
+//         stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+//     });
+// });
+
+
+// // Local development
+// if (require.main === module) {
+//     const PORT = process.env.PORT || 5000;
+//     app.listen(PORT, () => {
+//         console.log(`Server started on port ${PORT}`);
+//         connectToDatabase();
+//     });
+// }
+
+// // ✅ Vercel export - SAHI JAGAH
+// module.exports = app;
