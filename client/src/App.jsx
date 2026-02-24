@@ -18,7 +18,7 @@ import AdminResults from './pages/AdminResults';
 import VerifyVoters from './pages/VerifyVoters';
 import ManageElection from './pages/ManageElection';
 import VotingHistory from './pages/VotingHistory';
-
+import AllElections from './pages/AllElections';
 
 
 function App() {
@@ -42,8 +42,11 @@ function App() {
               <Route path="/results/:id" element={<Results />} />
 
               <Route path="/admin" element={<AdminDashboard />} />
+
               <Route path="/admin/create-election" element={<CreateElection />} />
               <Route path="/admin/elections/:id" element={<ManageElection />} />
+              <Route path="/admin/elections" element={<AllElections />} />
+
               <Route path="/admin/candidates" element={<ManageCandidates />} />
               <Route path="/admin/results" element={<AdminResults />} />
               <Route path="/admin/voters" element={<VerifyVoters />} />

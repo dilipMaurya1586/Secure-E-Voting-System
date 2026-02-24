@@ -10,21 +10,64 @@ exports.createElection = async (req, res) => {
     const { title, description, startDate, endDate } = req.body;
 
     try {
+        // Convert to Date objects
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const now = new Date();
+
+        // ✅ Calculate status based on dates
+        let status = 'upcoming';
+        if (now >= start && now <= end) {
+            status = 'ongoing';
+        } else if (now > end) {
+            status = 'completed';
+        }
+
+        console.log('Date check:', {
+            now: now.toISOString(),
+            start: start.toISOString(),
+            end: end.toISOString(),
+            calculatedStatus: status
+        });
+
         const election = new Election({
             title,
             description,
-            startDate,
-            endDate,
+            startDate: start,
+            endDate: end,
+            status, // ✅ Manually set status
             createdBy: req.user.id
         });
 
         await election.save();
         res.json(election);
     } catch (err) {
-        console.error(err.message);
+        console.error('Create election error:', err);
         res.status(500).send('Server error');
     }
 };
+// exports.createElection = async (req, res) => {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+//     const { title, description, startDate, endDate } = req.body;
+
+//     try {
+//         const election = new Election({
+//             title,
+//             description,
+//             startDate,
+//             endDate,
+//             createdBy: req.user.id
+//         });
+
+//         await election.save();
+//         res.json(election);
+//     } catch (err) {
+//         console.error(err.message);
+//         res.status(500).send('Server error');
+//     }
+// };
 
 // @route GET /api/admin/elections
 exports.getElections = async (req, res) => {
