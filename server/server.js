@@ -12,9 +12,11 @@ const app = express();
 
 // CORS setup
 app.use(cors({
-    origin: ['https://blockchain-based-secure-e-voting-sy.vercel.app', 'http://localhost:3000'],
+    origin: ['http://localhost:3000' , 'https://blockchain-based-secure-e-voting-sy.vercel.app'],
     credentials: true
 }));
+
+app.options('*', cors());
 
 app.use(express.json());
 
