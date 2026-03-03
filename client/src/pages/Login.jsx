@@ -7,8 +7,8 @@ import toast from 'react-hot-toast';
 import { login } from '../services/api';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('dm143dilip@gmail.com');
+  const [password, setPassword] = useState('Dilip@1586');
   const [showPassword, setShowPassword] = useState(false); // ✅ New state
   const [loading, setLoading] = useState(false);
   
