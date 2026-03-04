@@ -5,6 +5,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 /**
  * Generate a 6-digit OTP
+ * @returns {string} 6-digit OTP code
  */
 exports.generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -13,15 +14,21 @@ exports.generateOTP = () => {
 /**
  * Send OTP via Resend API
  * @param {string} email - recipient's email address
- * @param {string} otp - the OTP code
+ * @param {string} otp - the OTP code to send
  * @returns {Promise<boolean>} true if successful, false otherwise
  */
 exports.sendOTP = async (email, otp) => {
   try {
-    console.log(`📧 Attempting to send OTP to ${email}...`);
+    console.log(`📧 Preparing to send OTP to ${email}...`);
+
+    // Log the API key presence (but not the key itself)
+    if (!process.env.RESEND_API_KEY) {
+      console.error('❌ RESEND_API_KEY is not set in environment variables');
+      return false;
+    }
 
     const { data, error } = await resend.emails.send({
-      from: 'E-Voting System <onboarding@resend.dev>', // ✅ free testing sender
+      from: 'E-Voting System <onboarding@resend.dev>', // ✅ Free testing sender
       to: [email],
       subject: 'Your OTP for E-Voting Registration',
       html: `
@@ -44,8 +51,9 @@ exports.sendOTP = async (email, otp) => {
 
     console.log('✅ Email sent successfully. Message ID:', data?.id);
     return true;
-  } catch (error) {
-    console.error('❌ Unexpected error in sendOTP:', error);
+
+  } catch (err) {
+    console.error('❌ Unexpected error in sendOTP:', err);
     return false;
   }
 };
