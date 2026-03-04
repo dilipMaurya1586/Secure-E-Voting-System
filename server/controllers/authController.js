@@ -3,7 +3,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const { validateAge } = require('../utils/validators');
-const { generateOTP, sendOTP } = require('../utils/sendgridEmail'); // ✅ SendGrid import
+// const { generateOTP, sendOTP } = require('../utils/sendgridEmail'); // ✅ SendGrid import
+const { generateOTP, sendOTP } = require('../utils/resendEmail'); // ✅ SendGrid import
 
 // ✅ Strong password validation
 const validatePasswordStrength = (password) => {
