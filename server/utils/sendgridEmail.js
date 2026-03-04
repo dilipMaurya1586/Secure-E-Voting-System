@@ -3,32 +3,22 @@ const sgMail = require('@sendgrid/mail');
 // Initialize SendGrid with your API key
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-/**
- * Generate a 6-digit OTP
- */
 exports.generateOTP = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-/**
- * Send OTP via SendGrid
- * @param {string} email - recipient's email
- * @param {string} otp - OTP code
- * @returns {Promise<boolean>}
- */
 exports.sendOTP = async (email, otp) => {
+    console.log('========== SENDGRID DEBUG ==========');
+    console.log('1️⃣ sendOTP function CALLED');
+    console.log('2️⃣ Email:', email);
+    console.log('3️⃣ OTP:', otp);
+    console.log('4️⃣ API Key present:', process.env.SENDGRID_API_KEY ? '✅ YES' : '❌ NO');
+    console.log('5️⃣ From Email:', process.env.SENDGRID_FROM_EMAIL);
+
     try {
-        console.log(`📧 Sending OTP to ${email} via SendGrid...`);
-
-        // Check if API key exists
-        if (!process.env.SENDGRID_API_KEY) {
-            console.error('❌ SENDGRID_API_KEY not found in environment');
-            return false;
-        }
-
         const msg = {
             to: email,
-            from: process.env.SENDGRID_FROM_EMAIL, // Your verified sender email
+            from: process.env.SENDGRID_FROM_EMAIL,
             subject: 'Your OTP for E-Voting Registration',
             text: `Your OTP is: ${otp}. Valid for 10 minutes.`,
             html: `
@@ -44,12 +34,20 @@ exports.sendOTP = async (email, otp) => {
       `,
         };
 
+        console.log('6️⃣ Sending email via SendGrid...');
         const response = await sgMail.send(msg);
-        console.log('✅ Email sent successfully. Status:', response[0]?.statusCode);
+        console.log('7️⃣ SendGrid Response:', response[0]?.statusCode);
+        console.log('8️⃣ ✅ EMAIL SENT SUCCESSFULLY!');
         return true;
 
     } catch (error) {
-        console.error('❌ SendGrid error:', error.response?.body || error.message);
+        console.log('========== SENDGRID ERROR ==========');
+        console.error('❌ Error Type:', error.name);
+        console.error('❌ Error Message:', error.message);
+        if (error.response) {
+            console.error('❌ Response Body:', error.response.body);
+        }
+        console.log('===================================');
         return false;
     }
 };

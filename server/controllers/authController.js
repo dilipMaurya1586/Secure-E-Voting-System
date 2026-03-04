@@ -3,9 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const { validateAge } = require('../utils/validators');
-// ✅ Make sure generateOTP and sendOTP are correctly imported from your email utility
-// const { generateOTP, sendOTP } = require('../utils/resendEmail');
-const { generateOTP, sendOTP } = require('../utils/sendgridEmail');
+const { generateOTP, sendOTP } = require('../utils/sendgridEmail'); // ✅ SendGrid import
 
 // ✅ Strong password validation
 const validatePasswordStrength = (password) => {
@@ -30,6 +28,9 @@ const generateCustomUserId = async () => {
 
 // @route POST /api/auth/register
 exports.register = async (req, res) => {
+  console.log('🔥🔥🔥 REGISTER FUNCTION HIT 🔥🔥🔥');
+  console.log('📦 Request body:', req.body);
+
   try {
     const { firstName, middleName, lastName, email, mobileNumber, password, dateOfBirth, aadharNumber, street, city, state, pincode, country, role } = req.body;
 
@@ -96,23 +97,26 @@ exports.register = async (req, res) => {
     await user.save();
     console.log('✅ User saved with ID:', user._id);
 
-    // ---------------------------------------------------------
-    // ✅ IMPROVED EMAIL SENDING WITH DETAILED LOGGING
-    // ---------------------------------------------------------
+    // ------------------ SEND OTP EMAIL ------------------
+    console.log('📧 Preparing to send OTP to:', email);
+    console.log('📧 OTP value:', otp);
+    console.log('📧 sendOTP function type:', typeof sendOTP);
+
     try {
       const emailSent = await sendOTP(email, otp);
+      console.log('📧 sendOTP returned:', emailSent);
+      
       if (emailSent) {
-        console.log('✅ Email sent successfully to:', email);
+        console.log('✅ OTP email sent successfully to:', email);
       } else {
-        // If sendOTP returned false, the error was already logged inside sendOTP
-        console.error('❌ sendOTP returned false – check server/utils/resendEmail.js for errors');
+        console.log('❌ OTP email sending failed (returned false)');
       }
     } catch (err) {
-      // This will catch any unexpected errors thrown by sendOTP
-      console.error('❌ EMAIL ERROR DETAILS (exception):', err);
+      console.error('❌ EXCEPTION in sendOTP call:', err.message);
+      console.error('❌ Error stack:', err.stack);
     }
+    // ----------------------------------------------------
 
-    // Return success response
     return res.status(201).json({
       msg: 'Registration successful. Please verify your email with OTP.',
       userId: user._id
@@ -125,6 +129,8 @@ exports.register = async (req, res) => {
     }
   }
 };
+
+// ... rest of your functions (login, getMe, verifyOtp, resendOtp) remain exactly the same ...
 
 // @route POST /api/auth/login
 exports.login = async (req, res) => {
