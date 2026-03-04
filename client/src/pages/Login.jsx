@@ -8,7 +8,7 @@ import { login } from '../services/api';
 
 const Login = () => {
   const [email, setEmail] = useState('dm143dilip@gmail.com');
-  const [password, setPassword] = useState('Dilip@1586');
+  const [password, setPassword] = useState('Dilip@123456');
   const [showPassword, setShowPassword] = useState(false); // ✅ New state
   const [loading, setLoading] = useState(false);
   

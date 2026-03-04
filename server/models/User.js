@@ -13,15 +13,15 @@ const UserSchema = new mongoose.Schema({
   isVerified: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   address: {
-    street: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    pincode: { type: String, required: true },
+    street: { type: String },
+    city: { type: String },
+    state: { type: String },
+    pincode: { type: String },
     country: { type: String, default: 'India' }
   },
   // New fields
-  dateOfBirth: { type: Date, required: true },
-  aadharNumber: { type: String, required: true, unique: true },
+  dateOfBirth: { type: Date },
+  aadharNumber: { type: String },
   aadharImage: { type: String }, // path to uploaded file
   isEmailVerified: { type: Boolean, default: false },
   isDocumentVerified: { type: Boolean, default: false },

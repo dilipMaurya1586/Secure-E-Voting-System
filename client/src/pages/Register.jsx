@@ -9,15 +9,15 @@ const Register = () => {
   const [step, setStep] = useState(1);
   const [userId, setUserId] = useState('');
   const [formData, setFormData] = useState({
-    firstName: 'Kumar',
-    middleName: 'Shiv',
-    lastName: 'Yadav',
-    email: 'mauryadilip.work@gmail.com',
-    mobileNumber: '8626026390',
-    password: 'Kumar@123456',
-    confirmPassword: 'Kumar@123456',
+    firstName: 'Dilip',
+    middleName: 'Shivpujan',
+    lastName: 'Maurya',
+    email: 'dm143dilip@gmail.com',
+    mobileNumber: '7350541586',
+    password: 'Dilip@123456',
+    confirmPassword: 'Dilip@123456',
     dateOfBirth: '2000-01-02',
-    aadharNumber: '546786350916',
+    aadharNumber: '152516280629',
     aadharImage: null,
     street: 'Maharashtra Housing Board Society',
     city: 'Pune',

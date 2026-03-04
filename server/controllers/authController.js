@@ -28,46 +28,160 @@ const generateCustomUserId = async () => {
 };
 
 // @route POST /api/auth/register
-exports.register = async (req, res) => {
-  console.log('🔥🔥🔥 REGISTER FUNCTION HIT 🔥🔥🔥');
-  console.log('📦 Request body:', req.body);
+// exports.register = async (req, res) => {
+//   console.log('🔥🔥🔥 REGISTER FUNCTION HIT 🔥🔥🔥');
+//   console.log('📦 Request body:', req.body);
 
+//   try {
+//     const { firstName, middleName, lastName, email, mobileNumber, password, dateOfBirth, aadharNumber, street, city, state, pincode, country, role } = req.body;
+
+//     // Validation
+//     if (!firstName || !lastName || !email || !mobileNumber || !password || !dateOfBirth || !aadharNumber) {
+//       return res.status(400).json({ msg: 'All required fields must be filled' });
+//     }
+//     if (!street || !city || !state || !pincode) {
+//       return res.status(400).json({ msg: 'Complete address is required' });
+//     }
+
+//     // Password strength validation
+//     const passwordCheck = validatePasswordStrength(password);
+//     if (!passwordCheck.isValid) {
+//       return res.status(400).json({ msg: passwordCheck.errors.join(', ') });
+//     }
+
+//     // Check existing user
+//     const existingUser = await User.findOne({ $or: [{ email }, { mobileNumber }, { aadharNumber }] });
+//     if (existingUser) {
+//       if (existingUser.email === email) return res.status(400).json({ msg: 'Email already registered' });
+//       if (existingUser.mobileNumber === mobileNumber) return res.status(400).json({ msg: 'Mobile number already registered' });
+//       if (existingUser.aadharNumber === aadharNumber) return res.status(400).json({ msg: 'Aadhar number already registered' });
+//     }
+
+//     // Age validation
+//     const ageCheck = validateAge(dateOfBirth);
+//     if (!ageCheck.isValid) {
+//       return res.status(400).json({ msg: ageCheck.message, error: 'AGE_RESTRICTION', yourAge: ageCheck.age });
+//     }
+
+//     // Generate custom user ID
+//     const customUserId = await generateCustomUserId();
+
+//     // Create user
+//     const user = new User({
+//       customUserId,
+//       firstName,
+//       middleName,
+//       lastName,
+//       mobileNumber,
+//       email,
+//       password,
+//       role: role || 'voter',
+//       dateOfBirth,
+//       aadharNumber,
+//       aadharImage: req.file ? req.file.path : null,
+//       address: { street, city, state, pincode, country: country || 'India' },
+//       isEmailVerified: false,
+//       isDocumentVerified: false,
+//       isVerified: false
+//     });
+
+//     // Hash password
+//     const salt = await bcrypt.genSalt(10);
+//     user.password = await bcrypt.hash(password, salt);
+
+//     // Generate OTP
+//     const otp = generateOTP();
+//     user.otp = otp;
+//     user.otpExpiry = Date.now() + 10 * 60 * 1000;
+
+//     // Save user
+//     await user.save();
+//     console.log('✅ User saved with ID:', user._id);
+
+//     // ------------------ SEND OTP EMAIL ------------------
+//     console.log('📧 Preparing to send OTP to:', email);
+//     console.log('📧 OTP value:', otp);
+//     console.log('📧 sendOTP function type:', typeof sendOTP);
+
+//     try {
+//       const emailSent = await sendOTP(email, otp);
+//       console.log('📧 sendOTP returned:', emailSent);
+
+//       if (emailSent) {
+//         console.log('✅ OTP email sent successfully to:', email);
+//       } else {
+//         console.log('❌ OTP email sending failed (returned false)');
+//       }
+//     } catch (err) {
+//       console.error('❌ EXCEPTION in sendOTP call:', err.message);
+//       console.error('❌ Error stack:', err.stack);
+//     }
+//     // ----------------------------------------------------
+
+//     return res.status(201).json({
+//       msg: 'Registration successful. Please verify your email with OTP.',
+//       userId: user._id
+//     });
+
+//   } catch (err) {
+//     console.error('❌ Registration error:', err);
+//     if (!res.headersSent) {
+//       return res.status(500).json({ error: err.message });
+//     }
+//   }
+// };
+exports.register = async (req, res) => {
   try {
     const { firstName, middleName, lastName, email, mobileNumber, password, dateOfBirth, aadharNumber, street, city, state, pincode, country, role } = req.body;
 
-    // Validation
-    if (!firstName || !lastName || !email || !mobileNumber || !password || !dateOfBirth || !aadharNumber) {
-      return res.status(400).json({ msg: 'All required fields must be filled' });
-    }
-    if (!street || !city || !state || !pincode) {
-      return res.status(400).json({ msg: 'Complete address is required' });
+    // Common validation for both admin and voter
+    if (!firstName || !lastName || !email || !mobileNumber || !password) {
+      return res.status(400).json({ msg: 'Name, email, mobile and password are required for all users' });
     }
 
-    // Password strength validation
-    const passwordCheck = validatePasswordStrength(password);
-    if (!passwordCheck.isValid) {
-      return res.status(400).json({ msg: passwordCheck.errors.join(', ') });
+    // ✅ Admin vs Voter specific validation
+    if (role === 'admin') {
+      // Admin ke liye extra fields required nahi hain
+      console.log('Creating admin account without personal details');
+    } else {
+      // Voter ke liye saari fields required hain
+      if (!dateOfBirth) {
+        return res.status(400).json({ msg: 'Date of birth is required for voters' });
+      }
+      if (!aadharNumber) {
+        return res.status(400).json({ msg: 'Aadhar number is required for voters' });
+      }
+      if (!street || !city || !state || !pincode) {
+        return res.status(400).json({ msg: 'Complete address is required for voters' });
+      }
+
+      // Age validation sirf voter ke liye
+      const ageCheck = validateAge(dateOfBirth);
+      if (!ageCheck.isValid) {
+        return res.status(400).json({ msg: ageCheck.message, error: 'AGE_RESTRICTION', yourAge: ageCheck.age });
+      }
     }
 
-    // Check existing user
-    const existingUser = await User.findOne({ $or: [{ email }, { mobileNumber }, { aadharNumber }] });
+    // Check existing user (common for both)
+    const existingUser = await User.findOne({ $or: [{ email }, { mobileNumber }] });
     if (existingUser) {
       if (existingUser.email === email) return res.status(400).json({ msg: 'Email already registered' });
       if (existingUser.mobileNumber === mobileNumber) return res.status(400).json({ msg: 'Mobile number already registered' });
-      if (existingUser.aadharNumber === aadharNumber) return res.status(400).json({ msg: 'Aadhar number already registered' });
     }
 
-    // Age validation
-    const ageCheck = validateAge(dateOfBirth);
-    if (!ageCheck.isValid) {
-      return res.status(400).json({ msg: ageCheck.message, error: 'AGE_RESTRICTION', yourAge: ageCheck.age });
+    // Aadhar uniqueness check - sirf voter ke liye
+    if (role !== 'admin' && aadharNumber) {
+      const existingAadhar = await User.findOne({ aadharNumber });
+      if (existingAadhar) {
+        return res.status(400).json({ msg: 'Aadhar number already registered' });
+      }
     }
 
     // Generate custom user ID
     const customUserId = await generateCustomUserId();
 
-    // Create user
-    const user = new User({
+    // Create user object based on role
+    const userData = {
       customUserId,
       firstName,
       middleName,
@@ -76,50 +190,72 @@ exports.register = async (req, res) => {
       email,
       password,
       role: role || 'voter',
-      dateOfBirth,
-      aadharNumber,
-      aadharImage: req.file ? req.file.path : null,
-      address: { street, city, state, pincode, country: country || 'India' },
       isEmailVerified: false,
       isDocumentVerified: false,
       isVerified: false
-    });
+    };
+
+    // Voter ke liye extra fields add karo
+    if (role !== 'admin') {
+      // ✅ Voter validation – yeh ensure karega ki voter saari fields bhare
+      if (!dateOfBirth) {
+        return res.status(400).json({ msg: 'Date of birth is required for voters' });
+      }
+      if (!aadharNumber) {
+        return res.status(400).json({ msg: 'Aadhar number is required for voters' });
+      }
+      if (!street || !city || !state || !pincode) {
+        return res.status(400).json({ msg: 'Complete address is required for voters' });
+      }
+
+      // Age validation
+      const ageCheck = validateAge(dateOfBirth);
+      if (!ageCheck.isValid) {
+        return res.status(400).json({ msg: ageCheck.message });
+      }
+
+      userData.dateOfBirth = dateOfBirth;
+      userData.aadharNumber = aadharNumber;
+      userData.aadharImage = req.file ? req.file.path : null;
+      userData.address = { street, city, state, pincode, country: country || 'India' };
+    }
+
+    const user = new User(userData);
+
 
     // Hash password
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
 
-    // Generate OTP
-    const otp = generateOTP();
-    user.otp = otp;
-    user.otpExpiry = Date.now() + 10 * 60 * 1000;
+    // Generate OTP (sirf voter ke liye required)
+    if (role !== 'admin') {
+      const otp = generateOTP();
+      user.otp = otp;
+      user.otpExpiry = Date.now() + 10 * 60 * 1000;
+    }
 
-    // Save user
     await user.save();
     console.log('✅ User saved with ID:', user._id);
 
-    // ------------------ SEND OTP EMAIL ------------------
-    console.log('📧 Preparing to send OTP to:', email);
-    console.log('📧 OTP value:', otp);
-    console.log('📧 sendOTP function type:', typeof sendOTP);
-
-    try {
-      const emailSent = await sendOTP(email, otp);
-      console.log('📧 sendOTP returned:', emailSent);
-      
-      if (emailSent) {
-        console.log('✅ OTP email sent successfully to:', email);
-      } else {
-        console.log('❌ OTP email sending failed (returned false)');
+    // Send OTP email - sirf voter ke liye
+    if (role !== 'admin') {
+      try {
+        const emailSent = await sendOTP(email, user.otp);
+        if (emailSent) {
+          console.log('✅ OTP email sent to:', email);
+        } else {
+          console.log('⚠️ OTP email failed. OTP:', user.otp);
+        }
+      } catch (err) {
+        console.error('❌ Email error:', err);
       }
-    } catch (err) {
-      console.error('❌ EXCEPTION in sendOTP call:', err.message);
-      console.error('❌ Error stack:', err.stack);
     }
-    // ----------------------------------------------------
 
+    // Return success response
     return res.status(201).json({
-      msg: 'Registration successful. Please verify your email with OTP.',
+      msg: role === 'admin'
+        ? 'Admin account created successfully'
+        : 'Registration successful. Please verify your email with OTP.',
       userId: user._id
     });
 
