@@ -421,7 +421,7 @@ Dilip Maurya
 
 · 📧 Email: dm143dilip@gmail.com
 · 🐙 GitHub: dilipMaurya1586
-· 💼 LinkedIn: Dilip Maurya
+· 💼 LinkedIn: https://www.linkedin.com/in/dilip-maurya-9061a0306
 
 ---
 
