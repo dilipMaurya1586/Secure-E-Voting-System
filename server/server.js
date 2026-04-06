@@ -9,14 +9,27 @@ dotenv.config();
 const app = express();
 
 // ✅ FIXED CORS - Add your new frontend URL here
+// app.use(cors({
+//     origin: [
+//         'http://localhost:3000',
+//         'https://secure-e-voting-system-s8wr.vercel.app',
+//         'https://secure-e-voting-system-git-main-dilips-projects.vercel.app'
+//     ],
+//     credentials: true,
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+// }));
+
 app.use(cors({
     origin: [
         'http://localhost:3000',
-        'https://secure-e-voting-system-s8wr.vercel.app',
-        'https://secure-e-voting-system-git-main-dilips-projects.vercel.app'
+        'http://localhost:5173',
+        'https://secure-e-voting-system-phi.vercel.app',        // ✅ naya
+        'https://secure-e-voting-system-1g6t.onrender.com',      // purana (rakh agar kaam aaye)
+        'https://secure-e-voting-system-git-main-dilips-projects-37fdb3b5.vercel.app'
     ],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.options('*', cors());
