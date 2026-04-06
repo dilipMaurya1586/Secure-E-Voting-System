@@ -1,5 +1,5 @@
 ```markdown
-# 🗳️ Blockchain Based Secure E-Voting System
+# 🗳️ Secure E-Voting System
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-22.x-green.svg)](https://nodejs.org/)
