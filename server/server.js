@@ -6,21 +6,24 @@ const connectDB = require('./config/db');
 
 dotenv.config();
 
-
-// ✅ IMPORTANT: Vercel serverless ke liye
 const app = express();
 
-// CORS setup
+// ✅ FIXED CORS - Add your new frontend URL here
 app.use(cors({
-    origin: ['http://localhost:3000' , 'https://blockchain-based-secure-e-voting-sy.vercel.app'],
-    credentials: true
+    origin: [
+        'http://localhost:3000',
+        'https://secure-e-voting-system-s8wr.vercel.app',
+        'https://secure-e-voting-system-git-main-dilips-projects.vercel.app'
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
 
 app.options('*', cors());
 
 app.use(express.json());
 
-// Connect to MongoDB (with serverless-optimized connection)
+// Connect to MongoDB
 let isConnected = false;
 const connectToDatabase = async () => {
     if (isConnected) return;
@@ -44,17 +47,17 @@ app.get('/', (req, res) => {
     res.send('🚀 Server is running! API is live at /api');
 });
 
-// ✅ Error handling middleware
+// Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Server Error:', err);
-    res.status(500).json({ 
+    res.status(500).json({
         msg: 'Internal Server Error',
         error: err.message,
         stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
 });
 
-// Local development ke liye
+// Local development
 if (require.main === module) {
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
@@ -63,13 +66,7 @@ if (require.main === module) {
     });
 }
 
-// ✅ Vercel serverless export
 module.exports = app;
-
-
-
-
-
 
 // const express = require('express');
 // const path = require('path');
@@ -78,20 +75,32 @@ module.exports = app;
 // const connectDB = require('./config/db');
 
 // dotenv.config();
+
+
+// // ✅ IMPORTANT: Vercel serverless ke liye
 // const app = express();
 
+// // CORS setup
 // app.use(cors({
-//     origin: ['https://blockchain-based-secure-e-voting-sy.vercel.app', 'http://localhost:3000'],
+//     origin: ['http://localhost:3000' , 'https://blockchain-based-secure-e-voting-sy.vercel.app'],
 //     credentials: true
 // }));
 
+// app.options('*', cors());
+
 // app.use(express.json());
 
+// // Connect to MongoDB (with serverless-optimized connection)
 // let isConnected = false;
 // const connectToDatabase = async () => {
 //     if (isConnected) return;
-//     await connectDB();
-//     isConnected = true;
+//     try {
+//         await connectDB();
+//         isConnected = true;
+//         console.log('MongoDB Connected Successfully');
+//     } catch (error) {
+//         console.error('MongoDB Connection Error:', error);
+//     }
 // };
 
 // // API Routes
@@ -100,8 +109,12 @@ module.exports = app;
 // app.use('/api/voter', require('./routes/voterRoutes'));
 // app.use('/api/results', require('./routes/resultRoutes'));
 
+// // Simple route for root
+// app.get('/', (req, res) => {
+//     res.send('🚀 Server is running! API is live at /api');
+// });
 
-// // API Routes ke baad yeh add karo (line 35 ke around)
+// // ✅ Error handling middleware
 // app.use((err, req, res, next) => {
 //     console.error('Server Error:', err);
 //     res.status(500).json({ 
@@ -111,8 +124,7 @@ module.exports = app;
 //     });
 // });
 
-
-// // Local development
+// // Local development ke liye
 // if (require.main === module) {
 //     const PORT = process.env.PORT || 5000;
 //     app.listen(PORT, () => {
@@ -121,5 +133,7 @@ module.exports = app;
 //     });
 // }
 
-// // ✅ Vercel export - SAHI JAGAH
+// // ✅ Vercel serverless export
 // module.exports = app;
+
+
