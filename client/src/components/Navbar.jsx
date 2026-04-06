@@ -57,7 +57,7 @@ const Navbar = () => {
               </div>
               <div>
                 <span className="text-xl font-bold text-white block">
-                  Blockchain Based Secure e-voting System
+                  Secure E-Voting System
                 </span>
                 <span className="text-xs text-primary-200">
                   Secure • Transparent • Digital
